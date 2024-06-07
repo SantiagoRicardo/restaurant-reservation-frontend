@@ -1,35 +1,32 @@
-// api.ts
-import { RESERVATION_SERVICES } from "@/constants/services";
-import axios, { AxiosResponse } from "axios";
+import api from "@/constants/services";
 
 interface Reservation {
+  id?: number;
   customer_name: string;
   number_of_people: number;
   reservation_datetime: string;
-  status: string;
+  status?: string;
 }
 
-export function getAllReservations(): Promise<AxiosResponse> {
-  return axios.get(RESERVATION_SERVICES.GET_ALL);
-}
+export const getReservations = async () => {
+  const response = await api.get("/reservations/");
+  return response.data;
+};
 
-export function getReservationById(id: number): Promise<AxiosResponse> {
-  return axios.get(RESERVATION_SERVICES.GET_BY_ID(id));
-}
+export const createReservation = async (reservation: Reservation) => {
+  const response = await api.post("/reservations/", reservation);
+  return response.data;
+};
 
-export function createReservation(
-  newReservation: Reservation
-): Promise<AxiosResponse> {
-  return axios.post(RESERVATION_SERVICES.CREATE, newReservation);
-}
-
-export function updateReservation(
+export const updateReservation = async (
   id: number,
-  updatedReservation: Reservation
-): Promise<AxiosResponse> {
-  return axios.put(RESERVATION_SERVICES.UPDATE(id), updatedReservation);
-}
+  reservation: Omit<Reservation, "id">
+) => {
+  const response = await api.put(`/reservations/${id}`, reservation);
+  return response.data;
+};
 
-export function deleteReservation(id: number): Promise<AxiosResponse> {
-  return axios.delete(RESERVATION_SERVICES.DELETE(id));
-}
+export const deleteReservation = async (id: number) => {
+  const response = await api.delete(`/reservations/${id}`);
+  return response.data;
+};
