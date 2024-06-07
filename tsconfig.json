@@ -40,6 +40,14 @@
       }
     ]
   },
-  "include": [".eslintrc.cjs", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
+  "include": [
+    ".eslintrc.cjs",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.cjs",
+    "**/*.mjs",
+    "postcss.config.js",
+    "postcss.config.js"
+  ],
   "exclude": ["node_modules"]
 }
