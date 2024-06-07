@@ -31,9 +31,10 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ onCreate }) => {
 
   return (
     <form
-      className="px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md"
+      className="h-screen px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md"
       onSubmit={handleSubmit}
     >
+      <h2 className="mb-4 text-xl font-bold">New Reservation</h2>
       <div className="mb-4">
         <label
           className="block mb-2 text-sm font-bold text-gray-700"
@@ -86,7 +87,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ onCreate }) => {
       </div>
       <div className="flex items-center justify-between">
         <button
-          className="px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-700 focus:outline-none focus:shadow-outline"
+          className="w-full px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-700 focus:outline-none focus:shadow-outline"
           type="submit"
         >
           Create

@@ -8,6 +8,7 @@ import {
 } from "./services/reservation.services";
 import ReservationsTable from "./components/ReservationTable";
 import ReservationForm from "./components/ReservationForm";
+import "./index.css";
 
 const App: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -45,14 +46,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container p-4 mx-auto">
-      <h1 className="mb-4 text-2xl font-bold">Reservations</h1>
+    <div className="justify-between p-4 mx-auto md:flex">
       <ReservationsTable
         reservations={reservations}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
       />
-      <h2 className="mt-8 mb-4 text-xl font-bold">New Reservation</h2>
       <ReservationForm onCreate={handleCreate} />
     </div>
   );
