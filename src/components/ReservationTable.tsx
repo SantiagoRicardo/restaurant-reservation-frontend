@@ -1,6 +1,7 @@
 import { Reservation } from "@/services/types";
-import React from "react";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import React, { useState } from "react";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+
 interface ReservationsTableProps {
   reservations: Reservation[];
   onUpdate: (id: number, updatedReservation: Omit<Reservation, "id">) => void;
@@ -12,9 +13,48 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
   onUpdate,
   onDelete,
 }) => {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState<Omit<Reservation, "id">>({
+    customer_name: "",
+    number_of_people: 0,
+    reservation_datetime: "",
+    status: "",
+  });
+
+  const handleEditClick = (reservation: Reservation) => {
+    if (reservation.id !== undefined) {
+      setEditingId(reservation.id);
+      setEditFormData({
+        customer_name: reservation.customer_name,
+        number_of_people: reservation.number_of_people,
+        reservation_datetime: reservation.reservation_datetime,
+        status: reservation.status || "",
+      });
+    }
+  };
+
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditFormData((prevData) => ({
+      ...prevData,
+      [name]: name === "number_of_people" ? Number(value) : value,
+    }));
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingId !== null) {
+      onUpdate(editingId, editFormData);
+      setEditingId(null);
+    }
+  };
+
   const StyleTable =
     "px-6 py-4 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200";
   const StyleItemTable = "px-6 py-4 border-b border-gray-200";
+
   return (
     <div className="justify-between overflow-x-auto md:p-10">
       <div>
@@ -35,44 +75,136 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
           </thead>
           <tbody>
             {reservations.map((reservation) => (
-              <tr key={reservation.id}>
-                <td className={StyleItemTable}>{reservation.customer_name}</td>
-                <td className={StyleItemTable}>
-                  {new Date(
-                    reservation.reservation_datetime
-                  ).toLocaleDateString()}
-                </td>
-                <td className={StyleItemTable}>
-                  {new Date(
-                    reservation.reservation_datetime
-                  ).toLocaleTimeString()}
-                </td>
-                <td className={StyleItemTable}>
-                  {reservation.number_of_people}
-                </td>
-                <td className={StyleItemTable}>{reservation.status}</td>
-                <td className="px-6 py-4 border-b border-gray-200">
-                  <button
-                    className="text-indigo-600 hover:text-indigo-900"
-                    onClick={() =>
-                      onUpdate(reservation.id!, {
-                        customer_name: reservation.customer_name,
-                        number_of_people: reservation.number_of_people,
-                        reservation_datetime: reservation.reservation_datetime,
-                        status: reservation.status!,
-                      })
-                    }
-                  >
-                    Update
-                  </button>
-                  <button
-                    className="p-2 ml-4 text-white bg-red-500 rounded hover:bg-red-900"
-                    onClick={() => onDelete(reservation.id!)}
-                  >
-                    <TrashIcon className="w-6 h-6" />
-                  </button>
-                </td>
-              </tr>
+              <React.Fragment key={reservation.id}>
+                {editingId === reservation.id ? (
+                  <tr className="items-center">
+                    <td className={StyleItemTable}>
+                      <input
+                        type="text"
+                        name="customer_name"
+                        value={editFormData.customer_name}
+                        onChange={handleEditChange}
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </td>
+                    <td className={StyleItemTable}>
+                      <input
+                        type="date"
+                        name="reservation_datetime_date"
+                        value={new Date(editFormData.reservation_datetime)
+                          .toISOString()
+                          .substring(0, 10)}
+                        onChange={(e) =>
+                          setEditFormData((prevData) => ({
+                            ...prevData,
+                            reservation_datetime: new Date(
+                              e.target.value +
+                                "T" +
+                                new Date(editFormData.reservation_datetime)
+                                  .toISOString()
+                                  .substring(11, 19)
+                            ).toISOString(),
+                          }))
+                        }
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </td>
+                    <td className={StyleItemTable}>
+                      <input
+                        type="time"
+                        name="reservation_datetime_time"
+                        value={editFormData.reservation_datetime.substring(
+                          11,
+                          16
+                        )}
+                        onChange={(e) =>
+                          setEditFormData((prevData) => ({
+                            ...prevData,
+                            reservation_datetime:
+                              prevData.reservation_datetime.substring(0, 10) +
+                              "T" +
+                              e.target.value +
+                              ":00",
+                          }))
+                        }
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </td>
+                    <td className={StyleItemTable}>
+                      <input
+                        type="number"
+                        name="number_of_people"
+                        value={editFormData.number_of_people}
+                        onChange={handleEditChange}
+                        className="px-3 py-2 border rounded max-w-16 min-w-10"
+                      />
+                    </td>
+
+                    <td className={StyleItemTable}>
+                      <select
+                        name="status"
+                        value={editFormData.status}
+                        onChange={handleEditChange}
+                        className="w-full px-3 py-2 border rounded"
+                      >
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+
+                    <td className={StyleItemTable}>
+                      <button
+                        className="text-green-600 hover:text-green-900"
+                        onClick={handleEditSubmit}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className="text-red-600 md:ml-4 hover:text-red-900"
+                        onClick={() => setEditingId(null)}
+                      >
+                        Cancel
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td className={StyleItemTable}>
+                      {reservation.customer_name}
+                    </td>
+                    <td className={StyleItemTable}>
+                      {new Date(
+                        reservation.reservation_datetime
+                      ).toLocaleDateString()}
+                    </td>
+                    <td className={StyleItemTable}>
+                      {new Date(
+                        reservation.reservation_datetime
+                      ).toLocaleTimeString()}
+                    </td>
+                    <td className={StyleItemTable}>
+                      {reservation.number_of_people}
+                    </td>
+                    <td className={StyleItemTable}>{reservation.status}</td>
+                    <td className="flex px-6 py-4 border-b border-gray-200">
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900"
+                        onClick={() => handleEditClick(reservation)}
+                      >
+                        <PencilSquareIcon className="w-6 h-6" />
+                      </button>
+                      <button
+                        className="p-2 ml-4 text-white bg-red-500 rounded hover:bg-red-900"
+                        onClick={() => onDelete(reservation.id!)}
+                      >
+                        <TrashIcon className="w-6 h-6" />
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

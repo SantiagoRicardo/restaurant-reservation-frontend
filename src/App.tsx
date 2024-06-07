@@ -46,7 +46,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="justify-between p-4 mx-auto md:flex">
+    <div className="p-4 mx-auto md:flex">
       <ReservationsTable
         reservations={reservations}
         onUpdate={handleUpdate}
