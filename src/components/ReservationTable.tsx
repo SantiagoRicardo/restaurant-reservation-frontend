@@ -1,62 +1,82 @@
+import { Reservation } from "@/services/types";
 import React from "react";
 
-const ReservationsTable = () => {
-  // Datos de ejemplo para las filas de la tabla
-  const reservations = [
-    {
-      cliente: "John Smith",
-      fecha: "Junio 10, 2024",
-      hora: "4:00 PM",
-      personas: 4,
-      estado: "Confirmado",
-    },
-    {
-      cliente: "Robert Doe",
-      fecha: "Junio 11, 2024",
-      hora: "6:00 PM",
-      personas: 2,
-      estado: "Pendiente",
-    },
-    // Puedes añadir más reservaciones aquí
-  ];
+interface ReservationsTableProps {
+  reservations: Reservation[];
+  onUpdate: (id: number, updatedReservation: Omit<Reservation, "id">) => void;
+  onDelete: (id: number) => void;
+}
 
-  fetch("http://127.0.0.1:8000/reservations/")
-    .then((response) => response.json())
-    .then((data) => console.log(data));
-
+const ReservationsTable: React.FC<ReservationsTableProps> = ({
+  reservations,
+  onUpdate,
+  onDelete,
+}) => {
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full border border-collapse border-gray-200 table-auto">
+      <table className="min-w-full bg-white border border-gray-200">
         <thead>
-          <tr className="bg-gray-100">
-            <th className="px-4 py-2 border border-gray-200">Cliente</th>
-            <th className="px-4 py-2 border border-gray-200">Fecha</th>
-            <th className="px-4 py-2 border border-gray-200">Hora</th>
-            <th className="px-4 py-2 border border-gray-200">Personas</th>
-            <th className="px-4 py-2 border border-gray-200">Estado</th>
-            <th className="px-4 py-2 border border-gray-200">Acciones</th>
+          <tr>
+            <th className="px-6 py-3 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200">
+              Client
+            </th>
+            <th className="px-6 py-3 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200">
+              Date
+            </th>
+            <th className="px-6 py-3 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200">
+              Time
+            </th>
+            <th className="px-6 py-3 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200">
+              People
+            </th>
+            <th className="px-6 py-3 leading-4 tracking-wider text-left text-gray-600 border-b-2 border-gray-200">
+              Status
+            </th>
+            <th className="px-6 py-3 border-b-2 border-gray-200"></th>
           </tr>
         </thead>
         <tbody>
-          {reservations.map((reservation, index) => (
-            <tr key={index} className="hover:bg-gray-50">
-              <td className="px-4 py-2 border border-gray-200">
-                {reservation.cliente}
+          {reservations.map((reservation) => (
+            <tr key={reservation.id}>
+              <td className="px-6 py-4 border-b border-gray-200">
+                {reservation.customer_name}
               </td>
-              <td className="px-4 py-2 border border-gray-200">
-                {reservation.fecha}
+              <td className="px-6 py-4 border-b border-gray-200">
+                {new Date(
+                  reservation.reservation_datetime
+                ).toLocaleDateString()}
               </td>
-              <td className="px-4 py-2 border border-gray-200">
-                {reservation.hora}
+              <td className="px-6 py-4 border-b border-gray-200">
+                {new Date(
+                  reservation.reservation_datetime
+                ).toLocaleTimeString()}
               </td>
-              <td className="px-4 py-2 text-center border border-gray-200">
-                {reservation.personas}
+              <td className="px-6 py-4 border-b border-gray-200">
+                {reservation.number_of_people}
               </td>
-              <td className="px-4 py-2 border border-gray-200">
-                {reservation.estado}
+              <td className="px-6 py-4 border-b border-gray-200">
+                {reservation.status}
               </td>
-              <td className="px-4 py-2 text-blue-500 border border-gray-200 cursor-pointer hover:text-blue-800">
-                Actualizar
+              <td className="px-6 py-4 border-b border-gray-200">
+                <button
+                  className="text-indigo-600 hover:text-indigo-900"
+                  onClick={() =>
+                    onUpdate(reservation.id!, {
+                      customer_name: reservation.customer_name,
+                      number_of_people: reservation.number_of_people,
+                      reservation_datetime: reservation.reservation_datetime,
+                      status: reservation.status!,
+                    })
+                  }
+                >
+                  Update
+                </button>
+                <button
+                  className="ml-4 text-red-600 hover:text-red-900"
+                  onClick={() => onDelete(reservation.id!)}
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
