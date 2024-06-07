@@ -1,30 +1,45 @@
-# React + TypeScript + Vite
+# Restaurant Reservation Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Arquitectuta de Software del Sistema de Reservas
 
-Currently, two official plugins are available:
+![alt text](image.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Estructura del Proyecto
 
-## Expanding the ESLint configuration
+- src
+  - App.tsx
+  - index.css
+  - main.tsx
+  - vite-env.d.ts
+  - assets
+    - react.svg
+  - components
+    - ReservationForm.tsx
+    - ReservationTable.tsx
+  - constants
+    - services.ts
+  - services
+    - reservation.services.ts
+    - types.ts
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Ejecución del Proyecto
 
-- Configure the top-level `parserOptions` property like this:
+1. **Instalación de Dependencias**
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+   - Asegúrrse de tener Node.js y Yarn instalados en el sistema. Luego, desde la raíz del proyecto, ejecutar el siguiente comando para instalar las dependencias:
+     ```
+     yarn
+     ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+2. **Ejecución del Backend**
+
+   - Antes de ejecutar el frontend, asegúrate de que el backend esté corriendo y funcione correctamente.
+
+3. **Ejecución del Frontend**
+   - Una vez que el backend esté en funcionamiento, se puede iniciar el frontend utilizando el siguiente comando:
+     ```
+     yarn run dev
+     ```
+     Este comando compilará el proyecto y lo ejecutará en un servidor local. Después de que se complete la compilación, se podrá acceder al frontend a través del navegador web en la dirección `http://localhost:5173` (o en otro puerto si se especifica).
+
+# ¡Muchas Gracias!

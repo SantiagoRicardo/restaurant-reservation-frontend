@@ -1,6 +1,11 @@
 import { Reservation } from "@/services/types";
 import React, { useState } from "react";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  CheckIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 
 interface ReservationsTableProps {
   reservations: Reservation[];
@@ -147,10 +152,10 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                         onChange={handleEditChange}
                         className="w-full px-3 py-2 border rounded"
                       >
-                        <option value="active">Active</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
 
@@ -159,13 +164,13 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                         className="text-green-600 hover:text-green-900"
                         onClick={handleEditSubmit}
                       >
-                        Save
+                        <CheckIcon className="w-6 h-6" />
                       </button>
                       <button
-                        className="text-red-600 md:ml-4 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900"
                         onClick={() => setEditingId(null)}
                       >
-                        Cancel
+                        <XMarkIcon className="w-6 h-6" />
                       </button>
                     </td>
                   </tr>
@@ -187,7 +192,22 @@ const ReservationsTable: React.FC<ReservationsTableProps> = ({
                     <td className={StyleItemTable}>
                       {reservation.number_of_people}
                     </td>
-                    <td className={StyleItemTable}>{reservation.status}</td>
+                    <td className={StyleItemTable}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                          ${
+                            reservation.status === "Confirmed"
+                              ? "bg-green-100 text-green-800"
+                              : reservation.status === "Cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : reservation.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                      >
+                        {reservation.status}
+                      </span>
+                    </td>
                     <td className="flex px-6 py-4 border-b border-gray-200">
                       <button
                         className="text-indigo-600 hover:text-indigo-900"
