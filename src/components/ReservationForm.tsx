@@ -31,13 +31,13 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ onCreate }) => {
 
   return (
     <form
-      className="h-screen px-8 pt-6 pb-8 mb-4 bg-white rounded shadow-md"
+      className="px-8 pb-8 mt-6 mb-4 bg-white md:w-1/3 md:mt-12"
       onSubmit={handleSubmit}
     >
       <h2 className="mb-4 text-xl font-bold">New Reservation</h2>
       <div className="mb-4">
         <label
-          className="block mb-2 text-sm font-bold text-gray-700"
+          className="block mt-12 mb-2 text-sm font-bold text-gray-700"
           htmlFor="customer_name"
         >
           Client's Name
