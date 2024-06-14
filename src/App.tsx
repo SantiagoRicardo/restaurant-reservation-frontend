@@ -1,8 +1,8 @@
 import "./index.css";
-import Login from "./pages/Login";
+import Login from "./components/Login";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import ReservationForm from "./pages/ReservationForm";
-import ReservationsTable from "./pages/ReservationTable";
+import ReservationForm from "./components/ReservationForm";
+import ReservationsTable from "./components/ReservationTable";
 
 const App: React.FC = () => {
   const navigate = useNavigate();

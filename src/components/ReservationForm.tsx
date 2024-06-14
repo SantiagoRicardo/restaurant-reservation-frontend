@@ -11,6 +11,8 @@ const ReservationForm: React.FC = () => {
   //const [total_cost, setTotalCost] = useState<number | "">("");
   //const [id_reservation, setIdReservation] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [reservationSummary, setReservationSummary] =
+    useState<Reservation | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +27,7 @@ const ReservationForm: React.FC = () => {
       const response = await createReservation(newReservation);
       if (response.id_reservation) {
         setSuccess(true);
+        setReservationSummary(response);
         setCustomerName("");
         setReservationDatetime("");
         setAge("");
@@ -38,8 +41,8 @@ const ReservationForm: React.FC = () => {
         );
       }
     } catch (error) {
-      setError("Error creating reservation");
-      console.error("Error creating reservation:", error);
+      setError("Ya existe una reserva para esta fecha y hora.");
+      console.error("Ya existe una reserva para esta fecha y hora.", error);
       setSuccess(false);
     }
   };
@@ -130,9 +133,28 @@ const ReservationForm: React.FC = () => {
         >
           Crear
         </button>
-        {error && <p className="text-red-500">{error}</p>}
-        {success && <div className="text-green-500">Resumen</div>}
       </div>
+      {success && reservationSummary && (
+        <div className="p-4 mt-5 mb-4 bg-blue-100 rounded-lg">
+          <h2 className="mb-2 text-lg font-semibold">Resumen de la Reserva</h2>
+          <p>
+            <strong>Cliente:</strong> {reservationSummary.customer_name}
+          </p>
+          <p>
+            <strong>Fecha y Hora:</strong>{" "}
+            {new Date(
+              reservationSummary.reservation_datetime
+            )?.toLocaleString()}
+          </p>
+          <p>
+            <strong>Edad:</strong> {reservationSummary.age}
+          </p>
+          <p>
+            <strong>ID de Reservación:</strong>{" "}
+            {reservationSummary.id_reservation}
+          </p>
+        </div>
+      )}
     </form>
   );
 };

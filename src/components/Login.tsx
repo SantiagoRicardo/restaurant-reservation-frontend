@@ -12,8 +12,8 @@ const Login = () => {
     event.preventDefault();
     try {
       const data = await getTokenLogin({ username, password });
-      if (data) {
-        localStorage.setItem("token", data.token);
+      if (data && data.access_token) {
+        localStorage.setItem("token", data.access_token);
         navigate("/reservas");
         console.log(data);
       } else {
@@ -63,14 +63,6 @@ const Login = () => {
               >
                 Contraseña
               </label>
-              {/* <div className="text-sm">
-                  <a
-                    href="#"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Olvidastes tu contraseña?
-                  </a>
-                </div> */}
             </div>
             <div className="mt-2">
               <input

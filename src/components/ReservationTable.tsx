@@ -11,6 +11,7 @@ import {
   updateReservation,
   deleteReservation,
 } from "../services/reservation.services";
+import { useNavigate } from "react-router-dom";
 
 const ReservationsTable: React.FC = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -21,19 +22,28 @@ const ReservationsTable: React.FC = () => {
     age: 0,
     status: "",
   });
+  const [cancelReservationId, setCancelReservationId] = useState<string | null>(
+    null
+  );
+  const [allReservations, setAllReservations] = useState<Reservation[]>([]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
+      navigate("/iniciar-sesión");
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/iniciar-sesión");
+  };
 
   useEffect(() => {
     fetchReservations();
   }, []);
-
-  const fetchReservations = async () => {
-    try {
-      const data = await getReservations();
-      setReservations(data);
-    } catch (error) {
-      console.error("Error fetching reservations:", error);
-    }
-  };
 
   const handleEditClick = (reservation: Reservation) => {
     if (reservation.id !== undefined) {
@@ -53,29 +63,95 @@ const ReservationsTable: React.FC = () => {
     const { name, value } = e.target;
     setEditFormData((prevData) => ({
       ...prevData,
-      [name]: name === "number_of_people" ? Number(value) : value,
+      [name]: name === "age" ? Number(value) : value,
     }));
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingId !== null) {
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) {
+        console.error("No se encontró el token de autenticación");
+        return;
+      }
       try {
-        await updateReservation(editingId, editFormData);
-        fetchReservations(); // Refetch reservations after update
+        await updateReservation(
+          editingId,
+          {
+            ...editFormData,
+            age: Number(editFormData.age),
+          },
+          storedToken
+        );
+        fetchReservations();
         setEditingId(null);
       } catch (error) {
-        console.error("Error updating reservation:", error);
+        console.error("Error al actualizar la reservación", error);
       }
     }
   };
 
   const handleDelete = async (id: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("No se encontró el token. Por favor, inicie sesión nuevamente.");
+      return;
+    }
+
     try {
-      await deleteReservation(id);
-      fetchReservations(); // Refetch reservations after delete
+      await deleteReservation(id, token);
+      alert("Reservación eliminada exitosamente.");
     } catch (error) {
-      console.error("Error deleting reservation:", error);
+      console.error("Error al eliminar la reservación:", error);
+      return;
+    }
+  };
+
+  const fetchReservations = async () => {
+    try {
+      const data = await getReservations();
+      setReservations(data);
+      setAllReservations(data);
+    } catch (error) {
+      console.error("Error al obtener las reservaciones", error);
+    }
+  };
+
+  const handleCancelIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCancelReservationId(value);
+  };
+  const handleCancelSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (cancelReservationId) {
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) {
+        console.error("No se encontró el token de autenticación");
+        return;
+      }
+      const reservationToCancel = allReservations.find(
+        (reservation) => reservation.id_reservation === cancelReservationId
+      );
+      if (!reservationToCancel) {
+        console.error(
+          `No se encontró la reservación con ID ${cancelReservationId}`
+        );
+        return;
+      }
+
+      try {
+        await updateReservation(
+          reservationToCancel.id!,
+          { ...reservationToCancel, status: "cancelada" },
+          storedToken
+        );
+        fetchReservations();
+        setCancelReservationId("");
+        alert("Reservación cancelada exitosamente.");
+      } catch (error) {
+        console.error("Error al cancelar la reservación", error);
+      }
     }
   };
 
@@ -85,8 +161,31 @@ const ReservationsTable: React.FC = () => {
 
   return (
     <div className="justify-between overflow-x-auto md:p-10">
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Reservaciones</h1>
+        <button
+          onClick={handleLogout}
+          className="flex items-center px-4 py-2 mt-4 font-semibold text-white bg-red-500 rounded hover:bg-red-700"
+        >
+          Cerrar Sesión
+        </button>
+      </div>
+      <div className="flex items-center mt-4">
+        <form onSubmit={handleCancelSubmit}>
+          <input
+            type="text"
+            placeholder="ID de Reservación"
+            value={cancelReservationId || ""}
+            onChange={handleCancelIdChange}
+            className="px-3 py-2 border rounded-l"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 font-semibold text-white bg-red-500 rounded-r hover:bg-red-700"
+          >
+            Cancelar Reservación
+          </button>
+        </form>
       </div>
       <div className="container mt-28">
         <table className="table w-full bg-white border border-gray-200">
@@ -96,6 +195,8 @@ const ReservationsTable: React.FC = () => {
               <th className={StyleTable}>Fecha</th>
               <th className={StyleTable}>Hora</th>
               <th className={StyleTable}>Estado</th>
+              <th className={StyleTable}>Edad</th>
+              <th className={StyleTable}>Costo Total</th>
               <th className={StyleTable}>Acciones</th>
             </tr>
           </thead>
@@ -164,13 +265,21 @@ const ReservationsTable: React.FC = () => {
                         onChange={handleEditChange}
                         className="w-full px-3 py-2 border rounded"
                       >
-                        <option value="Active">Activa</option>
-                        <option value="Pending">Pendiente</option>
-                        <option value="Confirmed">Confirmado</option>
-                        <option value="Cancelled">Cancelada</option>
+                        <option value="activa">Activa</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="confirmada">Confirmado</option>
+                        <option value="cancelada">Cancelada</option>
                       </select>
                     </td>
-
+                    <td className={StyleItemTable}>
+                      <input
+                        type="number"
+                        name="age"
+                        value={editFormData.age}
+                        onChange={handleEditChange}
+                        className="w-full px-3 py-2 border rounded"
+                      />
+                    </td>
                     <td className={StyleItemTable}>
                       <button
                         className="text-green-600 hover:text-green-900"
@@ -219,6 +328,8 @@ const ReservationsTable: React.FC = () => {
                         {reservation.status}
                       </span>
                     </td>
+                    <td className={StyleItemTable}>{reservation.age}</td>
+                    <td className={StyleItemTable}>{reservation.total_cost}</td>
                     <td className="flex px-6 py-4 border-b border-gray-200">
                       <button
                         className="text-indigo-600 hover:text-indigo-900"
