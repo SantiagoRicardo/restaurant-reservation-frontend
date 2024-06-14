@@ -1,58 +1,35 @@
-import React, { useState, useEffect } from "react";
-import { Reservation } from "./services/types";
-import {
-  createReservation,
-  deleteReservation,
-  getReservations,
-  updateReservation,
-} from "./services/reservation.services";
-import ReservationsTable from "./components/ReservationTable";
-import ReservationForm from "./components/ReservationForm";
 import "./index.css";
+import Login from "./pages/Login";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import ReservationForm from "./pages/ReservationForm";
+import ReservationsTable from "./pages/ReservationTable";
 
 const App: React.FC = () => {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-
-  useEffect(() => {
-    fetchReservations();
-  }, []);
-
-  const fetchReservations = async () => {
-    const data = await getReservations();
-    setReservations(data);
-  };
-
-  const handleCreate = async (
-    newReservation: Omit<Reservation, "id" | "status">
-  ) => {
-    const createdReservation = await createReservation({
-      ...newReservation,
-      status: "active",
-    });
-    setReservations([...reservations, createdReservation]);
-  };
-
-  const handleUpdate = async (
-    id: number,
-    updatedReservation: Omit<Reservation, "id">
-  ) => {
-    await updateReservation(id, updatedReservation);
-    fetchReservations();
-  };
-
-  const handleDelete = async (id: number) => {
-    await deleteReservation(id);
-    fetchReservations();
-  };
+  const navigate = useNavigate();
 
   return (
-    <div className="p-4 mx-auto md:flex">
-      <ReservationsTable
-        reservations={reservations}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-      />
-      <ReservationForm onCreate={handleCreate} />
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex justify-center p-4 space-x-4 item-center">
+        <button
+          className="px-4 py-2 font-semibold text-white bg-blue-500 rounded hover:bg-blue-700"
+          onClick={() => navigate("/reservar")}
+        >
+          Crear Reservas
+        </button>
+        <button
+          className="px-4 py-2 font-semibold text-white bg-green-500 rounded hover:bg-green-700"
+          onClick={() => navigate("/iniciar-sesión")}
+        >
+          Admin
+        </button>
+      </div>
+      <div className="flex justify-center">
+        <Routes>
+          <Route path="/reservar" element={<ReservationForm />} />
+          <Route path="/iniciar-sesión" element={<Login />} />
+          <Route path="/reservas" element={<ReservationsTable />} />
+        </Routes>
+      </div>
     </div>
   );
 };
