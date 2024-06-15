@@ -37,7 +37,8 @@ const ReservationForm: React.FC = () => {
           response.customer_name,
           response.reservation_datetime,
           response.age,
-          response.id_reservation
+          response.id_reservation,
+          response.total_cost
         );
       }
     } catch (error) {
@@ -148,6 +149,9 @@ const ReservationForm: React.FC = () => {
           </p>
           <p>
             <strong>Edad:</strong> {reservationSummary.age}
+          </p>
+          <p>
+            <strong>Costo Total:</strong> {reservationSummary.total_cost} USD
           </p>
           <p>
             <strong>ID de Reservación:</strong>{" "}

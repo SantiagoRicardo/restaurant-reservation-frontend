@@ -267,7 +267,7 @@ const ReservationsTable: React.FC = () => {
                       >
                         <option value="activa">Activa</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="confirmada">Confirmado</option>
+                        <option value="confirmada">Confirmada</option>
                         <option value="cancelada">Cancelada</option>
                       </select>
                     </td>
@@ -329,7 +329,9 @@ const ReservationsTable: React.FC = () => {
                       </span>
                     </td>
                     <td className={StyleItemTable}>{reservation.age}</td>
-                    <td className={StyleItemTable}>{reservation.total_cost}</td>
+                    <td className={StyleItemTable}>
+                      {reservation.total_cost} USD
+                    </td>
                     <td className="flex px-6 py-4 border-b border-gray-200">
                       <button
                         className="text-indigo-600 hover:text-indigo-900"
